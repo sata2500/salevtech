@@ -1,29 +1,21 @@
-# Görev Planı - Slayt Bileşeni ve Admin Paneli Geliştirmesi
+# Görev Planı - Vercel Derleme Çözümü, Slayt & Uygulama Yönetimi
 
-## Mevcut Odak
-* Ana sayfa üst kısmına dinamik ve şık bir duyuru/slayt bileşeni (`PromoSlider`) eklemek.
-* Sitenin veri tabanı, NextAuth (Auth.js) ve admin paneli `/admin` için detaylı planlama ve altyapı hazırlığı yapmak.
+Bu plan, derleme hatalarının düzeltilmesini ve Admin panelinin tamamlanmasını hedefler.
 
 ## Yol Haritası & İlerleme
 
-- [ ] Slayt / Duyuru Alanı (`PromoSlider`)
-  - [ ] `PromoSlider` veri yapısının ve mock duyuruların hazırlanması
-  - [ ] `PromoSlider.tsx` ve `PromoSlider.module.css` bileşeninin yazılması (Vanilla CSS, cam efekti, otomatik geçiş, mobil uyum)
-  - [ ] Slayt alanının `src/app/page.tsx` içerisine entegre edilmesi
-- [ ] Veritabanı ve Kimlik Doğrulama Altyapısı
-  - [ ] Supabase PostgreSQL veri tabanının kurulması
-  - [ ] Prisma ORM kurulumu ve şemaların (`User`, `App`, `PromoSlide`, `Message`) oluşturulması
-  - [ ] NextAuth.js (Auth.js) yapılandırması (Credentials provider, Session ve JWT yönetimi)
-- [ ] Admin Paneli Tasarımı (`/admin`)
-  - [ ] Giriş Sayfası (`/admin/login`) tasarımı ve NextAuth bağlantısı
-  - [ ] Admin Dashboard yerleşimi (İstatistik paneli, responsive yan menü)
-  - [ ] Uygulamalar Yönetim Ekranı (CRUD arayüzü)
-  - [ ] Slayt / Duyuru Yönetim Ekranı
-  - [ ] Gelen İletişim Mesajları Görüntüleme Paneli
-- [ ] İş mantığı & Server Actions
-  - [ ] Veri Erişim Katmanı (Data Access Layer - DAL) ve oturum koruma kontrollerinin yazılması
-  - [ ] Uygulama ve Slayt ekleme/güncelleme/silme Server Action fonksiyonlarının yazılması (Zod doğrulamaları dahil)
-  - [ ] Medya yükleme (Image Upload) için Supabase Storage entegrasyonu
+- [/] Derleme Hatalarının Çözümü
+  - [x] Rotalardaki URL-encoded klasör adlarının düzeltilmesi (`(dashboard)`, `[slug]`, `[...nextauth]`)
+  - [ ] CSS `textSet` typo hatalarının düzeltilmesi (`AdminMessagesTable.tsx`, `AdminSlidesManager.tsx`)
+  - [ ] `package.json` build scriptine `prisma generate` eklenmesi
+- [ ] Slayt Yönetimi Entegrasyonu
+  - [ ] `/admin/slides/page.tsx` rotasının oluşturulması (Prisma veri çekme)
+- [ ] Uygulamalar Yönetim Ekranı (CRUD)
+  - [ ] `AdminAppsManager.tsx` ve `AdminAppsManager.module.css` bileşeninin yazılması (Nested changelog ve lists)
+  - [ ] `/admin/apps/page.tsx` rotasının oluşturulması (Prisma veri çekme)
+- [ ] Dinamik Veri Akışı
+  - [ ] `src/app/page.tsx` ana sayfasının dinamik Prisma sorguları ile beslenmesi (ve static fallback)
+  - [ ] `src/app/apps/[slug]/page.tsx` detay sayfasının dinamik yapılması
+  - [ ] `PromoSlider.tsx` bileşeninin `initialSlides` prop'u alacak şekilde güncellenmesi
 - [ ] Doğrulama ve Derleme
-  - [ ] TypeScript ve ESLint denetimlerinin yapılması
-  - [ ] Vercel derleme simülasyonu (`npm run build`)
+  - [ ] TypeScript ve ESLint denetimleri (`npm run build`)

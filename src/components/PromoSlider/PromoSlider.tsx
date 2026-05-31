@@ -8,21 +8,39 @@ import styles from "./PromoSlider.module.css";
 
 const SLIDE_DURATION = 6000; // 6 seconds per slide
 
-export default function PromoSlider() {
+interface Slide {
+  id: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  linkText: string;
+  linkHref: string;
+  bgGradient: string;
+  imageSrc: string | null;
+}
+
+interface PromoSliderProps {
+  initialSlides?: Slide[];
+}
+
+export default function PromoSlider({ initialSlides }: PromoSliderProps) {
+  const slides = initialSlides && initialSlides.length > 0 ? initialSlides : promoSlides;
   const [activeIdx, setActiveIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const nextSlide = useCallback(() => {
-    setActiveIdx((prev) => (prev + 1) % promoSlides.length);
+    if (slides.length === 0) return;
+    setActiveIdx((prev) => (prev + 1) % slides.length);
     setProgress(0);
-  }, []);
+  }, [slides.length]);
 
   const prevSlide = useCallback(() => {
-    setActiveIdx((prev) => (prev - 1 + promoSlides.length) % promoSlides.length);
+    if (slides.length === 0) return;
+    setActiveIdx((prev) => (prev - 1 + slides.length) % slides.length);
     setProgress(0);
-  }, []);
+  }, [slides.length]);
 
   const goToSlide = (idx: number) => {
     setActiveIdx(idx);
@@ -33,6 +51,7 @@ export default function PromoSlider() {
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    if (slides.length === 0) return;
 
     // Setup autoplay
     timerRef.current = setInterval(nextSlide, SLIDE_DURATION);
@@ -47,7 +66,7 @@ export default function PromoSlider() {
         return prev + 1;
       });
     }, stepDuration);
-  }, [nextSlide]);
+  }, [nextSlide, slides.length]);
 
   useEffect(() => {
     resetTimer();
@@ -57,10 +76,12 @@ export default function PromoSlider() {
     };
   }, [activeIdx, resetTimer]);
 
+  if (slides.length === 0) return null;
+
   return (
     <div className={styles.wrapper} id="promo-slider-container">
       <div className={`${styles.slider} glass`}>
-        {promoSlides.map((slide, idx) => {
+        {slides.map((slide, idx) => {
           const isActive = idx === activeIdx;
           return (
             <div
@@ -102,7 +123,7 @@ export default function PromoSlider() {
         {/* Controls: Dots & Arrows */}
         <div className={styles.controls}>
           <div className={styles.dots} id="promo-slider-dots">
-            {promoSlides.map((_, idx) => (
+            {slides.map((_, idx) => (
               <button
                 key={idx}
                 className={`${styles.dot} ${idx === activeIdx ? styles.dotActive : ""}`}

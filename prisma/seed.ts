@@ -1,9 +1,20 @@
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import { androidApps } from "../src/data/apps";
 import { promoSlides } from "../src/data/promos";
+import * as dotenv from "dotenv";
 
-const prisma = new PrismaClient();
+dotenv.config();
+
+const connectionString =
+  process.env.DATABASE_URL ||
+  "postgresql://postgres:postgres@localhost:5432/postgres";
+
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter } as any);
 
 async function main() {
   console.log("Seeding database...");
@@ -52,7 +63,7 @@ async function main() {
         targetSdk: app.specs.targetSdk,
         architecture: app.specs.architecture,
         permissions: app.specs.permissions,
-        changelog: JSON.parse(JSON.stringify(app.changelog)), // Convert to JSON-compatible format
+        changelog: JSON.parse(JSON.stringify(app.changelog)),
       },
       create: {
         id: app.id,
@@ -118,4 +129,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    pool.end();
   });

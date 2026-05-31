@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { submitContactMessageAction } from "@/app/admin/actions";
 import styles from "./ContactForm.module.css";
 
 export default function ContactForm() {
@@ -18,11 +19,15 @@ export default function ContactForm() {
     if (!formData.name || !formData.email || !formData.message) return;
 
     setIsSubmitting(true);
-    // Simulate API request delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormData({ name: "", email: "", message: "" });
+    try {
+      await submitContactMessageAction(formData);
+      setSubmitted(true);
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.error("Form submission error:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

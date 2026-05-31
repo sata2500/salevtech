@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { androidApps } from "@/data/apps";
+import { promoSlides as staticPromoSlides } from "@/data/promos";
+import prisma from "@/lib/prisma";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import AppCard from "@/components/AppCard/AppCard";
@@ -7,7 +9,80 @@ import ContactForm from "@/components/ContactForm/ContactForm";
 import PromoSlider from "@/components/PromoSlider/PromoSlider";
 import styles from "./page.module.css";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+async function getDynamicData() {
+  try {
+    const [dbApps, dbSlides] = await Promise.all([
+      prisma.androidApp.findMany({ orderBy: { createdAt: "asc" } }),
+      prisma.promoSlide.findMany({ orderBy: { createdAt: "asc" } }),
+    ]);
+
+    const apps =
+      dbApps.length > 0
+        ? dbApps.map((a) => ({
+            id: a.id,
+            slug: a.slug,
+            title: a.title,
+            tagline: a.tagline,
+            description: a.description,
+            longDescription: a.longDescription,
+            iconGradient: a.iconGradient,
+            iconSvg: a.iconSvg,
+            version: a.version,
+            size: a.size,
+            releaseDate: a.releaseDate,
+            playStoreUrl: a.playStoreUrl,
+            apkUrl: a.apkUrl,
+            category: a.category,
+            accentColor: a.accentColor,
+            features: a.features,
+            specs: {
+              minSdk: a.minSdk,
+              targetSdk: a.targetSdk,
+              architecture: a.architecture,
+              permissions: a.permissions,
+            },
+            changelog: Array.isArray(a.changelog)
+              ? (a.changelog as any[]).map((e: any) => ({
+                  version: e.version ?? "",
+                  date: e.date ?? "",
+                  notes: Array.isArray(e.notes) ? e.notes : [],
+                }))
+              : [],
+          }))
+        : androidApps;
+
+    const slides =
+      dbSlides.length > 0
+        ? dbSlides.map((s) => ({
+            id: s.id,
+            badge: s.badge,
+            title: s.title,
+            subtitle: s.subtitle,
+            linkText: s.linkText,
+            linkHref: s.linkHref,
+            bgGradient: s.bgGradient,
+            imageSrc: s.imageSrc ?? null,
+          }))
+        : staticPromoSlides.map((s) => ({
+            ...s,
+            imageSrc: s.imageSrc ?? null,
+          }));
+
+    return { apps, slides };
+  } catch {
+    // DB connection unavailable – use static mock data as fallback
+    return {
+      apps: androidApps,
+      slides: staticPromoSlides.map((s) => ({ ...s, imageSrc: s.imageSrc ?? null })),
+    };
+  }
+}
+
+export default async function Home() {
+  const { apps, slides } = await getDynamicData();
+
   return (
     <>
       <Header />
@@ -65,10 +140,10 @@ export default function Home() {
             </p>
           </div>
 
-          <PromoSlider />
+          <PromoSlider initialSlides={slides} />
 
           <div className={styles.appsGrid}>
-            {androidApps.map((app) => (
+            {apps.map((app) => (
               <AppCard key={app.id} app={app} />
             ))}
           </div>
@@ -144,7 +219,7 @@ export default function Home() {
               <div className={styles.statLabel}>Güvenli / Reklamsız</div>
             </div>
             <div className={`${styles.statCard} glass`}>
-              <div className={`${styles.statNumber} gradient-text-pink`}>3+</div>
+              <div className={`${styles.statNumber} gradient-text-pink`}>{apps.length}+</div>
               <div className={styles.statLabel}>Aktif Mobil Uygulama</div>
             </div>
           </div>

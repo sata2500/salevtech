@@ -2,12 +2,94 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { androidApps } from "@/data/apps";
+import prisma from "@/lib/prisma";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import styles from "./page.module.css";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Build a normalized "display app" type that is compatible
+// with both the static mock data structure and the Prisma DB.
+interface DisplayApp {
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string;
+  description: string;
+  longDescription: string;
+  iconGradient: string;
+  iconSvg: string;
+  version: string;
+  size: string;
+  releaseDate: string;
+  playStoreUrl: string;
+  apkUrl: string;
+  category: string;
+  accentColor: string;
+  features: string[];
+  specs: {
+    minSdk: string;
+    targetSdk: string;
+    architecture: string;
+    permissions: string[];
+  };
+  changelog: { version: string; date: string; notes: string[] }[];
+}
+
+// Prefer DB data; fallback to static mock when DB unavailable.
+async function getApp(slug: string): Promise<DisplayApp | null> {
+  try {
+    const dbApp = await prisma.androidApp.findUnique({ where: { slug } });
+
+    if (dbApp) {
+      return {
+        id: dbApp.id,
+        slug: dbApp.slug,
+        title: dbApp.title,
+        tagline: dbApp.tagline,
+        description: dbApp.description,
+        longDescription: dbApp.longDescription,
+        iconGradient: dbApp.iconGradient,
+        iconSvg: dbApp.iconSvg,
+        version: dbApp.version,
+        size: dbApp.size,
+        releaseDate: dbApp.releaseDate,
+        playStoreUrl: dbApp.playStoreUrl,
+        apkUrl: dbApp.apkUrl,
+        category: dbApp.category,
+        accentColor: dbApp.accentColor,
+        features: dbApp.features,
+        specs: {
+          minSdk: dbApp.minSdk,
+          targetSdk: dbApp.targetSdk,
+          architecture: dbApp.architecture,
+          permissions: dbApp.permissions,
+        },
+        changelog: Array.isArray(dbApp.changelog)
+          ? (dbApp.changelog as any[]).map((e: any) => ({
+              version: e.version ?? "",
+              date: e.date ?? "",
+              notes: Array.isArray(e.notes) ? e.notes : [],
+            }))
+          : [],
+      };
+    }
+  } catch {
+    // DB not available; silently use static fallback
+  }
+
+  // Static fallback
+  const staticApp = androidApps.find((a) => a.slug === slug);
+  if (!staticApp) return null;
+
+  return {
+    ...staticApp,
+    specs: staticApp.specs,
+    changelog: staticApp.changelog,
+  };
 }
 
 export async function generateStaticParams() {
@@ -18,7 +100,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const app = androidApps.find((a) => a.slug === slug);
+  const app = await getApp(slug);
   if (!app) return {};
 
   return {
@@ -28,13 +110,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `${app.title} | Salev Tech`,
       description: app.description,
       url: `https://salev.tech/apps/${app.slug}`,
-    }
+    },
   };
 }
 
 export default async function AppPage({ params }: PageProps) {
   const { slug } = await params;
-  const app = androidApps.find((a) => a.slug === slug);
+  const app = await getApp(slug);
 
   if (!app) {
     notFound();
