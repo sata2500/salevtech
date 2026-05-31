@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed password
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AndroidApp {
+  id              String   @id
+  slug            String   @unique
+  title           String
+  tagline         String
+  description     String
+  longDescription String   @db.Text
+  iconGradient    String
+  iconSvg         String   @db.Text
+  version         String
+  size            String
+  releaseDate     String
+  playStoreUrl    String
+  apkUrl          String
+  category        String
+  accentColor     String
+  features        String[] // Native string array in PostgreSQL
+  
+  // Technical specs
+  minSdk          String
+  targetSdk       String
+  architecture    String
+  permissions     String[] // Native string array in PostgreSQL
+  
+  // Changelog stored as structured JSON array: { version: string, date: string, notes: string[] }[]
+  changelog       Json
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PromoSlide {
+  id          String   @id @default(uuid())
+  badge       String
+  title       String
+  subtitle    String   @db.Text
+  linkText    String
+  linkHref    String
+  bgGradient  String
+  imageSrc    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
