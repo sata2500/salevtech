@@ -1,0 +1,350 @@
+.wrapper {
+  padding-top: 140px;
+  padding-bottom: 100px;
+  min-height: 100vh;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 32px;
+  transition: var(--transition-fast);
+}
+
+.backLink:hover {
+  color: #ffffff;
+  transform: translateX(-4px);
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 50px;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+}
+
+.iconWrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 50px;
+  height: 50px;
+  stroke: #ffffff;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+/* Main Grid Layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 48px;
+}
+
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.aboutCard,
+.specsCard {
+  padding: 32px;
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 12px;
+  color: #ffffff;
+}
+
+.longDescription {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 576px) {
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.checkIcon {
+  width: 18px;
+  height: 18px;
+  stroke: var(--color-primary);
+  stroke-width: 2.5;
+  fill: none;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+/* Specs Table */
+.specList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.specRow {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border-light);
+}
+
+.specRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.specLabel {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.specValue {
+  color: #ffffff;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.permissionTag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-light);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  margin-left: 6px;
+  margin-bottom: 6px;
+}
+
+/* Download sidebar card */
+.downloadCard {
+  padding: 32px;
+  position: sticky;
+  top: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.downloadHeader {
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 16px;
+}
+
+.downloadTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.downloadMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btnDownloadPlay {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--color-primary);
+  color: hsl(222, 28%, 7%);
+  font-weight: 700;
+  font-family: var(--font-display);
+  box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.3);
+  transition: var(--transition-smooth);
+}
+
+.btnDownloadPlay:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(var(--color-primary-rgb), 0.55);
+}
+
+.btnDownloadApk {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--color-secondary-rgb), 0.4);
+  background: rgba(var(--color-secondary-rgb), 0.05);
+  color: var(--color-secondary);
+  font-weight: 700;
+  font-family: var(--font-display);
+  transition: var(--transition-smooth);
+}
+
+.btnDownloadApk:hover {
+  background: rgba(var(--color-secondary-rgb), 0.15);
+  border-color: var(--color-secondary);
+  transform: translateY(-2px);
+}
+
+.downloadIcon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Changelog timeline */
+.changelogCard {
+  padding: 32px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  position: relative;
+  padding-left: 20px;
+  margin-top: 24px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--border-light);
+}
+
+.timelineItem {
+  position: relative;
+}
+
+.timelineDot {
+  position: absolute;
+  left: -24px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 0 8px var(--color-primary);
+}
+
+.timelineHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.timelineVersion {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.timelineDate {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.timelineNotes {
+  list-style: disc;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timelineNote {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
