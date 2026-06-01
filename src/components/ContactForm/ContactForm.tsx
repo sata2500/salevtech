@@ -6,8 +6,10 @@ import styles from "./ContactForm.module.css";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [honeypot, setHoneypot] = useState(""); // Bot tuzağı — görünmez alan
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -18,13 +20,19 @@ export default function ContactForm() {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
+    // Honeypot kontrolü — bu alan doluysa bot saldırısı
+    if (honeypot) return;
+
     setIsSubmitting(true);
+    setError("");
+
     try {
       await submitContactMessageAction(formData);
       setSubmitted(true);
       setFormData({ name: "", email: "", message: "" });
     } catch (err) {
       console.error("Form submission error:", err);
+      setError("Mesajınız gönderilemedi. Lütfen daha sonra tekrar deneyin.");
     } finally {
       setIsSubmitting(false);
     }
@@ -34,10 +42,24 @@ export default function ContactForm() {
     <div className={`${styles.contactCard} glass`} id="contact-form-container">
       {submitted ? (
         <div className={styles.successMsg} id="contact-success-msg">
-          Mesajınız başarıyla iletildi! En kısa sürede sizinle iletişime geçeceğiz.
+          ✓ Mesajınız başarıyla iletildi! En kısa sürede sizinle iletişime geçeceğiz.
         </div>
       ) : (
         <form onSubmit={handleSubmit} className={styles.contactForm}>
+          {/* Honeypot — CSS ile gizlendi, botlar doldurur insanlar doldurmaz */}
+          <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
+            <label htmlFor="contact-website">Website (bırakın boş)</label>
+            <input
+              type="text"
+              id="contact-website"
+              name="website"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <div className={styles.formGroup}>
             <label htmlFor="contact-name" className={styles.label}>
               Adınız / Firma Adı
@@ -84,6 +106,12 @@ export default function ContactForm() {
               placeholder="Bize nasıl yardımcı olabileceğimizi anlatın..."
             />
           </div>
+
+          {error && (
+            <div className={styles.errorMsg} id="contact-error-msg">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

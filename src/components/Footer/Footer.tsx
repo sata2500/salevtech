@@ -1,9 +1,33 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { androidApps } from "@/data/apps";
+import { androidApps as staticApps } from "@/data/apps";
 import styles from "./Footer.module.css";
+
+interface AppEntry {
+  id: string;
+  slug: string;
+  title: string;
+}
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [apps, setApps] = useState<AppEntry[]>(
+    staticApps.map((a) => ({ id: a.id, slug: a.slug, title: a.title }))
+  );
+
+  useEffect(() => {
+    // Uygulama listesini API'den çek (DB'deki güncel listeyi yansıtır)
+    fetch("/api/apps")
+      .then((res) => res.json())
+      .then((data: AppEntry[]) => {
+        if (Array.isArray(data) && data.length > 0) setApps(data);
+      })
+      .catch(() => {
+        // Hata durumunda statik listeyi kullanmaya devam et
+      });
+  }, []);
 
   return (
     <footer className={styles.footer}>
@@ -25,7 +49,7 @@ export default function Footer() {
           <div className={styles.column}>
             <h4 className={styles.title}>Uygulamalarımız</h4>
             <div className={styles.links}>
-              {androidApps.map((app) => (
+              {apps.map((app) => (
                 <Link
                   key={app.id}
                   href={`/apps/${app.slug}`}
@@ -52,7 +76,7 @@ export default function Footer() {
                 Çerez Politikası
               </Link>
               <Link href="/gdpr" className={styles.link} id="footer-link-gdpr">
-                KVKK & GDPR Aydınlatma
+                KVKK &amp; GDPR Aydınlatma
               </Link>
             </div>
           </div>
@@ -78,7 +102,7 @@ export default function Footer() {
           <p>© {currentYear} Salev Tech. Tüm Hakları Saklıdır.</p>
           <div className={styles.socials}>
             <a
-              href="https://github.com/salev-tech"
+              href="https://github.com/sata2500"
               target="_blank"
               rel="noreferrer"
               className={styles.socialIcon}

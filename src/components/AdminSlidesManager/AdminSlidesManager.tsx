@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSlideAction, updateSlideAction, deleteSlideAction } from "@/app/admin/actions";
 import styles from "../../app/admin/(dashboard)/dashboard.module.css";
 
@@ -24,6 +25,7 @@ export default function AdminSlidesManager({ initialSlides }: AdminSlidesManager
   const [modalOpen, setModalOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<Slide | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   // Form State
   const [badge, setBadge] = useState("");
@@ -94,9 +96,8 @@ export default function AdminSlidesManager({ initialSlides }: AdminSlidesManager
         );
       } else {
         await createSlideAction(payload);
-        // Refresh page or reload window to get the newly generated UUID in states safely,
-        // or just window.location.reload() for total synchronization.
-        window.location.reload();
+        // Refresh via Next.js router for clean state sync
+        router.refresh();
         return;
       }
       setModalOpen(false);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createAppAction, updateAppAction, deleteAppAction } from "@/app/admin/actions";
 import styles from "../../app/admin/(dashboard)/dashboard.module.css";
 
@@ -43,6 +44,7 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
   const [modalOpen, setModalOpen] = useState(false);
   const [editingApp, setEditingApp] = useState<AndroidApp | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   // Form State
   const [id, setId] = useState("");
@@ -202,7 +204,7 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
         await createAppAction(payload);
       }
       setModalOpen(false);
-      window.location.reload(); // Reload to sync state and fetch fresh server side data
+      router.refresh();
     } catch (err) {
       console.error(err);
       alert("Hata oluştu! Girdilerinizi kontrol edin (URL biçimi, minimum uzunluklar vb.).");
@@ -253,8 +255,11 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
                           justifyContent: "center",
                           color: "#ffffff",
                         }}
-                        dangerouslySetInnerHTML={{ __html: app.iconSvg }}
-                      />
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "100%", height: "100%" }}>
+                          <path d={app.iconSvg} />
+                        </svg>
+                      </div>
                       <span>{app.title}</span>
                     </div>
                   </td>
@@ -419,7 +424,7 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
 
                 {/* 9. Icon SVG */}
                 <div className={styles.formGroupFull}>
-                  <label className={styles.label}>Simge SVG Kodları (Raw HTML)</label>
+                  <label className={styles.label}>Simge SVG Path Verisi (yalnızca &quot;d&quot; değeri)</label>
                   <textarea
                     required
                     className={styles.textarea}

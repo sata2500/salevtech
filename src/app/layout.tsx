@@ -16,30 +16,49 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: "Salev Tech | Premium Android Apps Showcase",
+    default: "Salev Tech | Premium Android Mobil Uygulamalar",
     template: "%s | Salev Tech"
   },
-  description: "Explore innovative, highly performant, and secure Android applications developed by Salev Tech. Directly download APKs or find our apps on the Google Play Store.",
-  keywords: ["Salev Tech", "Android Apps", "Mobile Applications", "APK Download", "Google Play Store", "Android Developer"],
-  authors: [{ name: "Salev Tech" }],
+  description: "Salev Tech tarafından geliştirilen yenilikçi, yüksek performanslı ve güvenli Android uygulamalarını keşfedin. APK indirin veya uygulamalarımızı Google Play Store'da bulun.",
+  keywords: [
+    "Salev Tech", "Android uygulaması", "mobil uygulama indir",
+    "Android Apps", "APK indir", "Google Play Store",
+    "Türk Android geliştirici", "güvenli mobil uygulama",
+    "Mobile Applications", "Android Developer Turkey"
+  ],
+  authors: [{ name: "Salih Tanrıseven", url: "https://salev.tech" }],
   metadataBase: new URL("https://salev.tech"),
   openGraph: {
-    title: "Salev Tech | Premium Android Apps Showcase",
-    description: "Explore innovative, highly performant, and secure Android applications developed by Salev Tech.",
+    title: "Salev Tech | Premium Android Mobil Uygulamalar",
+    description: "Salev Tech tarafından geliştirilen yenilikçi, yüksek performanslı ve güvenli Android uygulamalarını keşfedin.",
     url: "https://salev.tech",
     siteName: "Salev Tech",
-    locale: "en_US",
+    locale: "tr_TR",
     type: "website",
+    images: [
+      {
+        url: "/banner.png",
+        width: 1024,
+        height: 500,
+        alt: "Salev Tech — Premium Android Uygulamalar",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Salev Tech | Premium Android Apps Showcase",
-    description: "Explore innovative, highly performant, and secure Android applications developed by Salev Tech.",
+    title: "Salev Tech | Premium Android Mobil Uygulamalar",
+    description: "Salev Tech tarafından geliştirilen yenilikçi ve güvenli Android uygulamalarını keşfedin.",
+    images: ["/banner.png"],
   },
   robots: {
     index: true,
     follow: true,
-  }
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
 };
 
 export default function RootLayout({
