@@ -56,10 +56,13 @@ const slideSchema = z.object({
   imageSrc: z.string().optional().nullable()
 });
 
+export type AppInput = z.infer<typeof appSchema>;
+export type SlideInput = z.infer<typeof slideSchema>;
+
 // ----------------------------------------------------
 // Android Apps Actions
 // ----------------------------------------------------
-export async function createAppAction(formData: any) {
+export async function createAppAction(formData: AppInput) {
   await checkAuth();
   
   const validated = appSchema.parse(formData);
@@ -77,7 +80,7 @@ export async function createAppAction(formData: any) {
   return { success: true };
 }
 
-export async function updateAppAction(id: string, formData: any) {
+export async function updateAppAction(id: string, formData: AppInput) {
   await checkAuth();
   
   const validated = appSchema.parse(formData);
@@ -113,7 +116,7 @@ export async function deleteAppAction(id: string) {
 // ----------------------------------------------------
 // Promo Slides Actions
 // ----------------------------------------------------
-export async function createSlideAction(formData: any) {
+export async function createSlideAction(formData: SlideInput) {
   await checkAuth();
   
   const validated = slideSchema.parse(formData);
@@ -128,7 +131,7 @@ export async function createSlideAction(formData: any) {
   return { success: true };
 }
 
-export async function updateSlideAction(id: string, formData: any) {
+export async function updateSlideAction(id: string, formData: SlideInput) {
   await checkAuth();
   
   const validated = slideSchema.parse(formData);

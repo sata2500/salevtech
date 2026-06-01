@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { markMessageAsReadAction, deleteMessageAction } from "@/app/admin/actions";
 import styles from "../../app/admin/(dashboard)/dashboard.module.css";
+import AdminModal from "../AdminModal/AdminModal";
 
 interface Message {
   id: string;
@@ -21,6 +22,33 @@ export default function AdminMessagesTable({ initialMessages }: AdminMessagesTab
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
+  // Modal states for delete confirmation and error alerts
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: "primary" | "danger" | "success" | "warning";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    variant: "primary",
+  });
+
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    variant: "primary" | "danger" | "success" | "warning";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    variant: "danger",
+  });
+
   const handleToggleRead = async (id: string, currentRead: boolean) => {
     setLoadingId(id);
     try {
@@ -30,24 +58,41 @@ export default function AdminMessagesTable({ initialMessages }: AdminMessagesTab
       );
     } catch (err) {
       console.error(err);
-      alert("Mesaj durumu güncellenirken bir hata oluştu.");
+      setAlertModal({
+        isOpen: true,
+        title: "Hata",
+        message: "Mesaj durumu güncellenirken bir hata oluştu.",
+        variant: "danger",
+      });
     } finally {
       setLoadingId(null);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bu mesajı silmek istediğinizden emin misiniz?")) return;
-    setLoadingId(id);
-    try {
-      await deleteMessageAction(id);
-      setMessages((prev) => prev.filter((msg) => msg.id !== id));
-    } catch (err) {
-      console.error(err);
-      alert("Mesaj silinirken bir hata oluştu.");
-    } finally {
-      setLoadingId(null);
-    }
+  const handleDelete = (id: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Mesajı Sil",
+      message: "Bu mesajı silmek istediğinizden emin misiniz?",
+      variant: "danger",
+      onConfirm: async () => {
+        setLoadingId(id);
+        try {
+          await deleteMessageAction(id);
+          setMessages((prev) => prev.filter((msg) => msg.id !== id));
+        } catch (err) {
+          console.error(err);
+          setAlertModal({
+            isOpen: true,
+            title: "Hata",
+            message: "Mesaj silinirken bir hata oluştu.",
+            variant: "danger",
+          });
+        } finally {
+          setLoadingId(null);
+        }
+      },
+    });
   };
 
   if (messages.length === 0) {
@@ -133,6 +178,29 @@ export default function AdminMessagesTable({ initialMessages }: AdminMessagesTab
           ))}
         </tbody>
       </table>
+
+      <AdminModal
+        isOpen={confirmModal.isOpen}
+        type="confirm"
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      <AdminModal
+        isOpen={alertModal.isOpen}
+        type="alert"
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+        onClose={() => setAlertModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

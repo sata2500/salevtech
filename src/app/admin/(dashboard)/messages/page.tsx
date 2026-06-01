@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import AdminMessagesTable from "@/components/AdminMessagesTable/AdminMessagesTable";
+import { ContactMessage } from "@prisma/client";
 import styles from "../dashboard.module.css";
 
 export const metadata = {
@@ -7,7 +8,7 @@ export const metadata = {
 };
 
 export default async function AdminMessagesPage() {
-  let messages: any[] = [];
+  let messages: ContactMessage[] = [];
   let dbError = false;
 
   try {

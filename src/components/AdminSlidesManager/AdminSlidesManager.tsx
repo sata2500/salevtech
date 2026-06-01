@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSlideAction, updateSlideAction, deleteSlideAction } from "@/app/admin/actions";
 import styles from "../../app/admin/(dashboard)/dashboard.module.css";
+import AdminModal from "../AdminModal/AdminModal";
 
 interface Slide {
   id: string;
@@ -26,6 +27,33 @@ export default function AdminSlidesManager({ initialSlides }: AdminSlidesManager
   const [editingSlide, setEditingSlide] = useState<Slide | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Modal states for delete confirmation and error alerts
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: "primary" | "danger" | "success" | "warning";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    variant: "primary",
+  });
+
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    variant: "primary" | "danger" | "success" | "warning";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    variant: "danger",
+  });
 
   // Form State
   const [badge, setBadge] = useState("");
@@ -60,18 +88,30 @@ export default function AdminSlidesManager({ initialSlides }: AdminSlidesManager
     setModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bu slaytı silmek istediğinizden emin misiniz?")) return;
-    setLoading(true);
-    try {
-      await deleteSlideAction(id);
-      setSlides((prev) => prev.filter((s) => s.id !== id));
-    } catch (err) {
-      console.error(err);
-      alert("Slayt silinirken bir hata oluştu.");
-    } finally {
-      setLoading(false);
-    }
+  const handleDelete = (id: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Slaytı Sil",
+      message: "Bu slaytı silmek istediğinizden emin misiniz?",
+      variant: "danger",
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await deleteSlideAction(id);
+          setSlides((prev) => prev.filter((s) => s.id !== id));
+        } catch (err) {
+          console.error(err);
+          setAlertModal({
+            isOpen: true,
+            title: "Hata",
+            message: "Slayt silinirken bir hata oluştu.",
+            variant: "danger",
+          });
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,7 +143,12 @@ export default function AdminSlidesManager({ initialSlides }: AdminSlidesManager
       setModalOpen(false);
     } catch (err) {
       console.error(err);
-      alert("Slayt kaydedilirken hata oluştu. Girdilerinizi kontrol edin.");
+      setAlertModal({
+        isOpen: true,
+        title: "Kayıt Hatası",
+        message: "Slayt kaydedilirken hata oluştu. Girdilerinizi kontrol edin.",
+        variant: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -310,6 +355,29 @@ export default function AdminSlidesManager({ initialSlides }: AdminSlidesManager
           </div>
         </div>
       )}
+
+      <AdminModal
+        isOpen={confirmModal.isOpen}
+        type="confirm"
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      <AdminModal
+        isOpen={alertModal.isOpen}
+        type="alert"
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+        onClose={() => setAlertModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

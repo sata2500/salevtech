@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createAppAction, updateAppAction, deleteAppAction } from "@/app/admin/actions";
 import styles from "../../app/admin/(dashboard)/dashboard.module.css";
+import AdminModal from "../AdminModal/AdminModal";
 
 interface ChangelogEntry {
   version: string;
@@ -45,6 +46,33 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
   const [editingApp, setEditingApp] = useState<AndroidApp | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Modal states for delete confirmation and error alerts
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: "primary" | "danger" | "success" | "warning";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    variant: "primary",
+  });
+
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    variant: "primary" | "danger" | "success" | "warning";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    variant: "danger",
+  });
 
   // Form State
   const [id, setId] = useState("");
@@ -145,18 +173,30 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
     setModalOpen(true);
   };
 
-  const handleDelete = async (appId: string) => {
-    if (!confirm("Bu uygulamayı ve tüm verilerini silmek istediğinizden emin misiniz?")) return;
-    setLoading(true);
-    try {
-      await deleteAppAction(appId);
-      setApps((prev) => prev.filter((a) => a.id !== appId));
-    } catch (err) {
-      console.error(err);
-      alert("Uygulama silinirken bir hata oluştu.");
-    } finally {
-      setLoading(false);
-    }
+  const handleDelete = (appId: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Uygulamayı Sil",
+      message: "Bu uygulamayı ve tüm verilerini silmek istediğinizden emin misiniz?",
+      variant: "danger",
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await deleteAppAction(appId);
+          setApps((prev) => prev.filter((a) => a.id !== appId));
+        } catch (err) {
+          console.error(err);
+          setAlertModal({
+            isOpen: true,
+            title: "Hata",
+            message: "Uygulama silinirken bir hata oluştu.",
+            variant: "danger",
+          });
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,7 +247,12 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert("Hata oluştu! Girdilerinizi kontrol edin (URL biçimi, minimum uzunluklar vb.).");
+      setAlertModal({
+        isOpen: true,
+        title: "Kayıt Hatası",
+        message: "Hata oluştu! Girdilerinizi kontrol edin (URL biçimi, minimum uzunluklar vb.).",
+        variant: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -673,6 +718,29 @@ export default function AdminAppsManager({ initialApps }: AdminAppsManagerProps)
           </div>
         </div>
       )}
+
+      <AdminModal
+        isOpen={confirmModal.isOpen}
+        type="confirm"
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      <AdminModal
+        isOpen={alertModal.isOpen}
+        type="alert"
+        title={alertModal.title}
+        message={alertModal.message}
+        variant={alertModal.variant}
+        onClose={() => setAlertModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

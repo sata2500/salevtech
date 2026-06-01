@@ -39,6 +39,34 @@ async function main() {
     console.log(`- Admin kullanıcısı zaten mevcut.`);
   }
 
+  // 1.2. Create Requested User (salihtanriseven25@gmail.com)
+  const user2Email = "salihtanriseven25@gmail.com";
+  const existingUser2 = await prisma.user.findUnique({
+    where: { email: user2Email },
+  });
+
+  if (!existingUser2) {
+    const hashedPassword2 = await bcrypt.hash("A736500z@", 10);
+    await prisma.user.create({
+      data: {
+        email: user2Email,
+        name: "Salih Tanrıseven",
+        password: hashedPassword2,
+      },
+    });
+    console.log(`- Kullanıcı oluşturuldu: ${user2Email} (Şifre: A736500z@)`);
+  } else {
+    // Update password if it already exists to ensure requested password works
+    const hashedPassword2 = await bcrypt.hash("A736500z@", 10);
+    await prisma.user.update({
+      where: { email: user2Email },
+      data: {
+        password: hashedPassword2,
+      },
+    });
+    console.log(`- Kullanıcı zaten mevcut, şifresi güncellendi: ${user2Email}`);
+  }
+
   // 2. Seed Android Apps
   for (const app of androidApps) {
     await prisma.androidApp.upsert({

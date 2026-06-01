@@ -110,8 +110,8 @@ export default function PromoSlider({ initialSlides }: PromoSliderProps) {
                   <Image
                     src={slide.imageSrc}
                     alt={slide.title}
-                    width={48}
-                    height={48}
+                    width={80}
+                    height={80}
                     style={{ objectFit: "contain" }}
                   />
                 </div>
